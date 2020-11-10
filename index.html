@@ -16,13 +16,14 @@
    socket.on('userSet', function (data) {
       console.log("Your data", data);
       user = data.username;
-      document.body.innerHTML = '<input type="text" placeholder="Send public message" id = "message">\
-         <button type = "button" name = "button" id="send" onclick = "sendMessage()">Send</button>\
-         </br>\
-      <input type="text" placeholder="Enter your friend UserId" id = "userId">\
+      document.body.innerHTML = `<div><b>Welcome: ${user}</b></div><br>\
+      <div>Your user Id: <b>${socket.id}</b> Share it with your friend to receive personal message</div><br>\
+      <input type="text" placeholder="Send public message" id = "message">\
+         <button type = "button" name = "button" id="send" onclick = "sendMessage()">Send</button><br><br>\
+         <br><br><input type="text" placeholder="Enter your friend UserId" id = "userId">\
       <input type="text" placeholder="Enter your message for your friend" id = "privatemessage">\
-         <button type = "button" name = "button" id="send" onclick = "sendPrivateMessage()">Send</button>\
-         <div id = "message-container"></div>'
+         <button type = "button" name = "button" id="send" onclick = "sendPrivateMessage()">Send</button><br><br>\
+         <div id = "message-container"></div>`
    })
 
    function sendPrivateMessage() {
