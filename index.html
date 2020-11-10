@@ -1,44 +1,72 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>Hello world</title>
-   </head>
-   
-   <script src = "/socket.io/socket.io.js"></script>
-   <script>
-      var socket = io()
-      function setUsername() {
-         socket.emit('setUsername', document.getElementById('name').value)
-      }
 
-      socket.on('userSet', function(data) {
-         user = data.username
-         document.body.innerHTML = '<input type = "text" id = "message">\
+<head>
+   <title>Hello world</title>
+</head>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+   var socket = io.connect("http://localhost:3000");
+   let sessionID;
+   function setUsername() {
+      socket.emit('setUsername', document.getElementById('name').value, socket.id)
+   }
+
+   socket.on('userSet', function (data) {
+      console.log("Your data", data);
+      user = data.username;
+      document.body.innerHTML = '<input type="text" placeholder="Send public message" id = "message">\
          <button type = "button" name = "button" id="send" onclick = "sendMessage()">Send</button>\
+         </br>\
+      <input type="text" placeholder="Enter your friend UserId" id = "userId">\
+      <input type="text" placeholder="Enter your message for your friend" id = "privatemessage">\
+         <button type = "button" name = "button" id="send" onclick = "sendPrivateMessage()">Send</button>\
          <div id = "message-container"></div>'
-      })
-      
-      function sendMessage() {
-         var msg = document.getElementById('message').value
-         if(msg) {
-            socket.emit('msg', {message: msg, to: user})
-         }
+   })
+
+   function sendPrivateMessage() {
+      console.log("Send")
+      var msg = document.getElementById('privatemessage').value;
+      var id = document.getElementById('userId').value;
+      if (!id) {
+         return alert('Please add insert userId');
       }
+      if (!msg) {
+         return alert('Add a message for user')
+      }
+      var data = { msg, id, from: user }
+      socket.emit('sendprivate_msg', data)
+   }
 
-      socket.on('newmsg', function(data) {
-         if(user) {
-            document.getElementById('message-container').innerHTML += '<div><b>' + 
-               data.to + '</b>: ' + data.message + '</div>'
-         }
-      })
 
-        </script>
-   
-   <body>
-       <input id = "name" type = "text" name = "name" value = "" 
-         placeholder = "Enter your name!">
-      <button type = "button" name = "button" onclick = "setUsername()">
-         Let me chat!
-      </button>
-   </body>
-</html> 
+
+   function sendMessage() {
+      var msg = document.getElementById('message').value
+      if (msg) {
+         socket.emit('msg', { message: msg, to: user })
+      }
+   }
+
+   socket.on('newmsg', function (data) {
+      if (user) {
+         document.getElementById('message-container').innerHTML += '<div><b>' +
+            data.to + '</b>: ' + data.message + '</div>'
+      }
+   })
+   socket.on('private_msg', function (data) {
+      console.log('private msg', data)
+      document.getElementById('message-container').innerHTML += '<div><b>' +
+         data.from + '</b>: ' + data.msg + '</div>'
+   })
+
+</script>
+
+<body>
+   <input id="name" type="text" name="name" value="" placeholder="Enter your name!">
+   <button type="button" name="button" onclick="setUsername()">
+      Let me chat!
+   </button>
+</body>
+
+</html>
